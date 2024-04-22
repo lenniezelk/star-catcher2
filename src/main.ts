@@ -1,5 +1,6 @@
 import RiveCanvas, { type File } from '@rive-app/canvas-advanced-single';
 import './style.css';
+import Player from './player';
 
 async function main() {
   // Load the Rive WASM file
@@ -29,6 +30,20 @@ async function main() {
     bgStateMachine,
     bgArtboard,
   );
+
+  const player = new Player(canvas, rive, file);
+
+  const keyPresses = new Set<string>();
+
+  document.addEventListener('keydown', (event) => {
+    keyPresses.add(event.key);
+    player.handleKeyPress(keyPresses);
+  });
+
+  document.addEventListener('keyup', (event) => {
+    keyPresses.delete(event.key);
+    player.handleKeyPress(keyPresses);
+  });
 
   let lastTime = 0;
 
@@ -61,6 +76,9 @@ async function main() {
     );
     bgArtboard.draw(renderer);
     renderer.restore();
+
+    player.update(elapsedTimeSec);
+    player.draw(renderer);
 
     rive.requestAnimationFrame(renderLoop);
   }
