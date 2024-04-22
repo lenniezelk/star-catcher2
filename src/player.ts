@@ -2,6 +2,7 @@ import type {
   Artboard,
   File,
   RiveCanvas,
+  SMIInput,
   StateMachineInstance,
   WrappedRenderer,
 } from '@rive-app/canvas-advanced-single';
@@ -17,6 +18,7 @@ export default class Player {
   private stateMachine: StateMachineInstance;
   private _xSpeed = 0;
   private _ySpeed = 0;
+  private _direction: SMIInput | undefined;
 
   constructor(
     public canvas: HTMLCanvasElement,
@@ -34,6 +36,14 @@ export default class Player {
       x: 50,
       y: canvas.height / 2 - this.artboard.bounds.maxY / 2,
     };
+
+    for (let i = 0; i < this.stateMachine.inputCount(); i++) {
+      const input = this.stateMachine.input(i);
+      if (input.name === 'direction') {
+        this._direction = input.asNumber();
+        break;
+      }
+    }
   }
 
   update(elapsedTimeSec: number) {
@@ -52,11 +62,20 @@ export default class Player {
 
   handleKeyPress(keyPresses: Set<string>) {
     this._ySpeed = 0;
+    let direction = 0;
+
     if (keyPresses.has('ArrowUp')) {
       this._ySpeed = -300;
+      direction = 1;
     }
+
     if (keyPresses.has('ArrowDown')) {
       this._ySpeed = 300;
+      direction = 2;
+    }
+
+    if (this._direction) {
+      this._direction.value = direction;
     }
   }
 }
