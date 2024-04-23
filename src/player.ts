@@ -6,11 +6,7 @@ import type {
   StateMachineInstance,
   WrappedRenderer,
 } from '@rive-app/canvas-advanced-single';
-
-interface Position {
-  x: number;
-  y: number;
-}
+import { Position } from './types';
 
 export default class Player {
   private position: Position;

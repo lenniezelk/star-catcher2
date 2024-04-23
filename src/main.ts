@@ -1,6 +1,7 @@
 import RiveCanvas, { type File } from '@rive-app/canvas-advanced-single';
 import './style.css';
 import Player from './player';
+import Star from './star';
 
 async function main() {
   // Load the Rive WASM file
@@ -45,6 +46,18 @@ async function main() {
     player.handleKeyPress(keyPresses);
   });
 
+  // Create an array to hold the stars
+  let stars: Star[] = [];
+
+  // Generate stars
+
+  function generateStars() {
+    if (Math.random() < 0.01) {
+      const star = new Star(canvas, rive, file);
+      stars.push(star);
+    }
+  }
+
   let lastTime = 0;
 
   function renderLoop(time: number) {
@@ -56,6 +69,8 @@ async function main() {
     lastTime = time;
 
     renderer.clear();
+
+    generateStars();
 
     // Advance the background state machine instance and the artboard
     bgStateMachineInstance.advance(elapsedTimeSec);
@@ -79,6 +94,25 @@ async function main() {
 
     player.update(elapsedTimeSec);
     player.draw(renderer);
+
+    // Update and draw stars
+    stars.forEach((star) => {
+      star.update(elapsedTimeSec);
+      star.draw(renderer);
+    });
+
+    // Remove off-screen stars
+    const toDelete: Star[] = [];
+
+    stars.forEach((star) => {
+      if (star.position.x < -200) {
+        toDelete.push(star);
+      }
+    });
+
+    stars = stars.filter((star) => !toDelete.includes(star));
+
+    toDelete.forEach((star) => star.destroy());
 
     rive.requestAnimationFrame(renderLoop);
   }
