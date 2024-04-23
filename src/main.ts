@@ -114,6 +114,29 @@ async function main() {
 
     toDelete.forEach((star) => star.destroy());
 
+    const collidedStars: Star[] = [];
+
+    function checkCollisions() {
+      stars.forEach((star) => {
+        if (
+          player.bounds.minX < star.bounds.maxX &&
+          player.bounds.maxX > star.bounds.minX &&
+          player.bounds.minY < star.bounds.maxY &&
+          player.bounds.maxY > star.bounds.minY
+        ) {
+          collidedStars.push(star);
+        }
+      });
+    }
+
+    checkCollisions();
+
+    stars = stars.filter((star) => !collidedStars.includes(star));
+
+    collidedStars.forEach((star) => {
+      star.destroy();
+    });
+
     rive.requestAnimationFrame(renderLoop);
   }
 

@@ -74,4 +74,13 @@ export default class Player {
       this._direction.value = direction;
     }
   }
+
+  get bounds() {
+    return {
+      minX: this.position.x + 30,
+      minY: this.position.y + 30,
+      maxX: this.position.x + this.artboard.bounds.maxX - 30,
+      maxY: this.position.y + this.artboard.bounds.maxY - 30,
+    };
+  }
 }

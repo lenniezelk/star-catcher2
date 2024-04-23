@@ -53,4 +53,13 @@ export default class Star {
     this.artboard.delete();
     this.stateMachine.delete();
   }
+
+  get bounds() {
+    return {
+      minX: this._position.x + 50,
+      minY: this._position.y + 50,
+      maxX: this._position.x + this.artboard.bounds.maxX - 50,
+      maxY: this._position.y + this.artboard.bounds.maxY - 50,
+    };
+  }
 }
