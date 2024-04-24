@@ -13,22 +13,18 @@ async function main() {
 
   // Load the background music and sound effects
   let hasUserInteracted = false;
-  let bgMusicLoaded = false;
 
   const bgMusic = document.getElementById(
     'backgroundMusic',
   ) as HTMLAudioElement;
 
   bgMusic.addEventListener('canplaythrough', () => {
-    bgMusicLoaded = true;
-
     if (hasUserInteracted) {
       bgMusic.play();
     }
   });
 
   bgMusic.addEventListener('error', () => {
-    bgMusicLoaded = false;
     console.error('Error loading bg music');
   });
 
