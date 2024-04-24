@@ -2,6 +2,7 @@ import RiveCanvas, { type File } from '@rive-app/canvas-advanced-single';
 import './style.css';
 import Player from './player';
 import Star from './star';
+import Score from './score';
 
 async function main() {
   // Load the Rive WASM file
@@ -33,6 +34,7 @@ async function main() {
   );
 
   const player = new Player(canvas, rive, file);
+  const score = new Score(canvas, rive, file);
 
   const keyPresses = new Set<string>();
 
@@ -94,6 +96,8 @@ async function main() {
 
     player.update(elapsedTimeSec);
     player.draw(renderer);
+    score.update(elapsedTimeSec);
+    score.draw(renderer);
 
     // Update and draw stars
     stars.forEach((star) => {
@@ -135,6 +139,10 @@ async function main() {
 
     collidedStars.forEach((star) => {
       star.destroy();
+    });
+
+    collidedStars.forEach((star) => {
+      score.score += star.value;
     });
 
     rive.requestAnimationFrame(renderLoop);
