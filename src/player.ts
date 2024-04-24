@@ -47,6 +47,13 @@ export default class Player {
     this.artboard.advance(elapsedTimeSec);
     this.position.x += this._xSpeed * elapsedTimeSec;
     this.position.y += this._ySpeed * elapsedTimeSec;
+    if (this.position.y < 20) {
+      this.position.y = 20;
+    }
+
+    if (this.position.y > this.canvas.height - this.artboard.bounds.maxY - 20) {
+      this.position.y = this.canvas.height - this.artboard.bounds.maxY - 20;
+    }
   }
 
   draw(renderer: WrappedRenderer) {

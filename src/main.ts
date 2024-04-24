@@ -1,7 +1,8 @@
-import RiveCanvas, { type File } from '@rive-app/canvas-advanced-single';
+import RiveCanvas from '@rive-app/canvas-advanced-single';
+import type { File } from '@rive-app/canvas-advanced-single';
 import './style.css';
 import Player from './player';
-import Star from './star';
+import { LargeStar, SmallStar, SpecialStar, type Star } from './star';
 import Score from './score';
 
 async function main() {
@@ -9,6 +10,40 @@ async function main() {
   const rive = await RiveCanvas();
   // Get the canvas element
   const canvas = document.getElementById('canvas')! as HTMLCanvasElement;
+
+  // Load the background music and sound effects
+  let hasUserInteracted = false;
+  let bgMusicLoaded = false;
+
+  const bgMusic = document.getElementById(
+    'backgroundMusic',
+  ) as HTMLAudioElement;
+
+  bgMusic.addEventListener('canplaythrough', () => {
+    bgMusicLoaded = true;
+
+    if (hasUserInteracted) {
+      bgMusic.play();
+    }
+  });
+
+  bgMusic.addEventListener('error', () => {
+    bgMusicLoaded = false;
+    console.error('Error loading bg music');
+  });
+
+  document.addEventListener('click', () => {
+    hasUserInteracted = true;
+    bgMusic.play();
+  });
+
+  const starPickSound = document.getElementById(
+    'starPickupSound',
+  ) as HTMLAudioElement;
+
+  starPickSound.addEventListener('error', () => {
+    console.error('Error loading star pickup sound');
+  });
 
   // Create a renderer
   const renderer = rive.makeRenderer(canvas);
@@ -54,8 +89,16 @@ async function main() {
   // Generate stars
 
   function generateStars() {
-    if (Math.random() < 0.01) {
-      const star = new Star(canvas, rive, file);
+    const random = Math.random();
+
+    if (random < 0.001) {
+      const star = new SpecialStar(canvas, rive, file);
+      stars.push(star);
+    } else if (random < 0.005) {
+      const star = new LargeStar(canvas, rive, file);
+      stars.push(star);
+    } else if (random < 0.01) {
+      const star = new SmallStar(canvas, rive, file);
       stars.push(star);
     }
   }
@@ -96,6 +139,7 @@ async function main() {
 
     player.update(elapsedTimeSec);
     player.draw(renderer);
+
     score.update(elapsedTimeSec);
     score.draw(renderer);
 
@@ -118,28 +162,40 @@ async function main() {
 
     toDelete.forEach((star) => star.destroy());
 
+    // Check for collisions
     const collidedStars: Star[] = [];
 
     function checkCollisions() {
-      stars.forEach((star) => {
-        if (
-          player.bounds.minX < star.bounds.maxX &&
-          player.bounds.maxX > star.bounds.minX &&
-          player.bounds.minY < star.bounds.maxY &&
-          player.bounds.maxY > star.bounds.minY
-        ) {
-          collidedStars.push(star);
-        }
-      });
+      stars
+        .filter((star) => !star.isPicked && !star.isDestroyed)
+        .forEach((star) => {
+          if (
+            player.bounds.minX < star.bounds.maxX &&
+            player.bounds.maxX > star.bounds.minX &&
+            player.bounds.minY < star.bounds.maxY &&
+            player.bounds.maxY > star.bounds.minY
+          ) {
+            collidedStars.push(star);
+          }
+        });
     }
 
     checkCollisions();
 
-    stars = stars.filter((star) => !collidedStars.includes(star));
-
     collidedStars.forEach((star) => {
-      star.destroy();
+      star.pick();
+      if (hasUserInteracted) {
+        starPickSound.play();
+      }
     });
+
+    stars.forEach((star) => {
+      if (star.isDestroyed) {
+        star.destroy();
+      }
+    });
+
+    stars = stars.filter((star) => !star.isDestroyed);
 
     collidedStars.forEach((star) => {
       score.score += star.value;
