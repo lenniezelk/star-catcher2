@@ -10,6 +10,7 @@ The production version of the game can be found [here](https://star-catcher2.pag
 
 - Node.js
 - Code editor (VS Code, Sublime Text, Atom, etc.)
+- Git
 
 ## How to run
 
