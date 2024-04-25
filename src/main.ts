@@ -18,6 +18,8 @@ async function main() {
     'backgroundMusic',
   ) as HTMLAudioElement;
 
+  bgMusic.volume = 0.3;
+
   bgMusic.addEventListener('canplaythrough', () => {
     if (hasUserInteracted) {
       bgMusic.play();
