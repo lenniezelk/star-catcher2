@@ -18,7 +18,7 @@ async function main() {
     'backgroundMusic',
   ) as HTMLAudioElement;
 
-  bgMusic.volume = 0.3;
+  bgMusic.volume = 0.05;
 
   bgMusic.addEventListener('canplaythrough', () => {
     if (hasUserInteracted) {
@@ -42,6 +42,8 @@ async function main() {
   starPickSound.addEventListener('error', () => {
     console.error('Error loading star pickup sound');
   });
+
+  starPickSound.volume = 0.05;
 
   // Create a renderer
   const renderer = rive.makeRenderer(canvas);
